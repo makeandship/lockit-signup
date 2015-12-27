@@ -169,8 +169,18 @@ Signup.prototype.postSignup = function(req, res, next) {
 
       // looks like everything is fine
 
+      // gather additional columns from the request
+      var extensions = {}
+      for (var column in config.userColumns) {
+        var value = req.body[column];
+
+        if (value) {
+          extensions[column] = value;
+        }
+      }
+
       // save new user to db
-      adapter.save(name, email, password, function(saveErr, savedUser) {
+      adapter.save(name, email, password, extensions, function(saveErr, savedUser) {
         if (saveErr) {return next(saveErr); }
 
         // send email with link for address verification
