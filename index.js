@@ -188,16 +188,32 @@ Signup.prototype.postSignup = function(req, res, next) {
         m.signup(savedUser.name, savedUser.email, savedUser.signupToken, function(signupErr) {
           if (signupErr) {return next(signupErr); }
 
-          // emit event
-          that.emit('signup::post', savedUser);
+          if (config.signup.afterSignup) {
+            config.signup.afterSignup(req, savedUser, function(err, data) {
+              // emit event
+              that.emit('signup::post', savedUser);
 
-          // send only JSON when REST is active
-          if (config.rest) {return res.send(204); }
+              // send only JSON when REST is active
+              if (config.rest) {return res.send(204); }
 
-          res.render(successView, {
-            title: 'Sign up - Email sent',
-            basedir: req.app.get('views')
-          });
+              res.render(successView, {
+                title: 'Sign up - Email sent',
+                basedir: req.app.get('views')
+              });
+            });            
+          }
+          else {
+            // emit event
+            that.emit('signup::post', savedUser);
+
+            // send only JSON when REST is active
+            if (config.rest) {return res.send(204); }
+
+            res.render(successView, {
+              title: 'Sign up - Email sent',
+              basedir: req.app.get('views')
+            });
+          }
         });
 
       });
