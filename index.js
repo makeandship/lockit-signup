@@ -170,12 +170,21 @@ Signup.prototype.postSignup = function(req, res, next) {
       // looks like everything is fine
 
       // gather additional columns from the request
-      var extensions = {}
+      // gather additional columns from the request
+      var extensions = {userColumns: {}, profileColumns: {}}
       for (var column in config.userColumns) {
         var value = req.body[column];
 
         if (value) {
-          extensions[column] = value;
+          extensions.userColumns[column] = value;
+        }
+      }
+	  
+      for (var column in config.profileColumns) {
+        var value = req.body["profile."+column];
+
+        if (value) {
+          extensions.profileColumns[column] = value;
         }
       }
 
